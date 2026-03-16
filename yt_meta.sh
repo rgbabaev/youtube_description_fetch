@@ -36,11 +36,11 @@ fi
 
 # Extract title (anchored to videoDetails)
 TITLE=$(echo "$PLAYER_JSON" \
-  | sed -n 's/.*"videoDetails":{[^}]*"title":"\([^"]*\)".*/\1/p')
+  | sed -n 's/.*"videoDetails":{[^}]*"title":"\([^"\\]*\(\\.[^"\\]*\)*\)".*/\1/p')
 
 # Extract description
 DESC=$(echo "$PLAYER_JSON" \
-  | sed -n 's/.*"shortDescription":"\([^"]*\)".*/\1/p')
+  | sed -n 's/.*"shortDescription":"\([^"\\]*\(\\.[^"\\]*\)*\)".*/\1/p')
 
 # Basic unescaping
 TITLE=$(echo "$TITLE" | sed 's/\\"/"/g; s/\\u0026/\&/g')
