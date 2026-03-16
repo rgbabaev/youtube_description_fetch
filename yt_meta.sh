@@ -34,17 +34,20 @@ if [ -z "$PLAYER_JSON" ]; then
   exit 1
 fi
 
-# Extract title (anchored to videoDetails)
+# grep -oP with PCRE: (\\.|[^"])* correctly skips escaped quotes
 TITLE=$(echo "$PLAYER_JSON" \
-  | sed -n 's/.*"videoDetails":{[^}]*"title":"\([^"]*\)".*/\1/p')
+  | grep -oP '"videoDetails":\{[^}]*"title":"\K(\\.|[^"])*')
 
-# Extract description
 DESC=$(echo "$PLAYER_JSON" \
-  | sed -n 's/.*"shortDescription":"\([^"]*\)".*/\1/p')
+  | grep -oP '"shortDescription":"\K(\\.|[^"])*')
 
-# Basic unescaping
-TITLE=$(echo "$TITLE" | sed 's/\\"/"/g; s/\\u0026/\&/g')
-DESC=$(echo "$DESC" | sed 's/\\n/\n/g; s/\\"/"/g; s/\\u0026/\&/g')
+# Unescape JSON string sequences
+unescape() {
+  printf '%b' "$1" | sed 's/\\"/"/g; s/\\u0026/\&/g; s/\\\//\//g'
+}
+
+TITLE=$(unescape "$TITLE")
+DESC=$(unescape "$DESC")
 
 echo "Title:"
 echo "$TITLE"
